@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/smtp"
 
 	"github.com/osuTitanic/common-go/config"
@@ -12,12 +13,16 @@ import (
 // SMTPEmail delivers messages using an SMTP server
 type SMTPEmail struct {
 	config *config.Config
+	logger *slog.Logger
 	auth   smtp.Auth
 }
 
 // NewSMTPEmail constructs an SMTP-backed email sender
 func NewSMTPEmail(config *config.Config) Email {
-	return &SMTPEmail{config: config}
+	return &SMTPEmail{
+		config: config,
+		logger: slog.Default().With("component", "email"),
+	}
 }
 
 // FromAddress returns the configured default sender address.
