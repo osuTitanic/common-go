@@ -67,7 +67,7 @@ func (s *SMTPEmail) Send(message *Message) error {
 	if err != nil {
 		return fmt.Errorf("email: failed to connect to SMTP server: %w", err)
 	}
-	defer client.Close()
+	defer client.Quit()
 
 	if s.config.SmtpTls {
 		if ok, _ := client.Extension("STARTTLS"); ok {
@@ -103,19 +103,12 @@ func (s *SMTPEmail) Send(message *Message) error {
 	if err != nil {
 		return fmt.Errorf("email: failed to open SMTP data writer: %w", err)
 	}
+	defer writer.Close()
 
 	if _, err := writer.Write(mimeMessage); err != nil {
-		writer.Close()
 		return fmt.Errorf("email: failed to write message body: %w", err)
 	}
 
-	if err := writer.Close(); err != nil {
-		return fmt.Errorf("email: failed to finalize message body: %w", err)
-	}
-
-	if err := client.Quit(); err != nil {
-		return fmt.Errorf("email: failed to close SMTP connection: %w", err)
-	}
-
+	s.logger.Debug("SMTP email sent", "to", message.To, "subject", message.Subject)
 	return nil
 }
