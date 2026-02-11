@@ -43,6 +43,12 @@ func NewMultiLogger(level slog.Level, writers ...io.Writer) *slog.Logger {
 	return slog.New(handler)
 }
 
+func NewComponentLogger(component string, level slog.Level, writers ...io.Writer) *slog.Logger {
+	multi := io.MultiWriter(writers...)
+	handler := NewColorLogger(multi, level)
+	return slog.New(handler).With("component", component)
+}
+
 func (h *ColorLogger) Enabled(_ context.Context, level slog.Level) bool {
 	return level >= h.level
 }

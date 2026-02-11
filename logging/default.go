@@ -6,10 +6,8 @@ import (
 )
 
 func SetDefault(component string, level slog.Level, additionalWriters ...io.Writer) {
-	writers := make([]io.Writer, 0, 1+len(additionalWriters))
-	writers = append(writers, GetConsoleWriter())
-	writers = append(writers, additionalWriters...)
-	slog.SetDefault(NewMultiLogger(level, writers...).With("component", component))
+	writers := append([]io.Writer{GetConsoleWriter()}, additionalWriters...)
+	slog.SetDefault(NewComponentLogger(component, level, writers...))
 }
 
 func init() {
