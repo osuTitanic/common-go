@@ -38,42 +38,22 @@ type User struct {
 	Location  *string `gorm:"column:userpage_location"`
 	Interests *string `gorm:"column:userpage_interests"`
 
-	TargetRelationships    []*Relationship         `gorm:"foreignKey:TargetId;references:Id"`
-	Relationships          []*Relationship         `gorm:"foreignKey:UserId;references:Id"`
-	Collaborations         []*BeatmapCollaboration `gorm:"foreignKey:UserId;references:Id"`
-	ReplayHistory          []*ReplayHistory        `gorm:"foreignKey:UserId;references:Id"`
-	Nominations            []*BeatmapNomination    `gorm:"foreignKey:UserId;references:Id"`
-	BookmarkedTopics       []*ForumBookmark        `gorm:"foreignKey:UserId;references:Id"`
-	SubscribedTopics       []*ForumSubscriber      `gorm:"foreignKey:UserId;references:Id"`
-	Verifications          []*Verification         `gorm:"foreignKey:UserId;references:Id"`
-	Notifications          []*Notification         `gorm:"foreignKey:UserId;references:Id"`
-	CreatedTopics          []*ForumTopic           `gorm:"foreignKey:CreatorId;references:Id"`
-	StarredTopics          []*ForumStar            `gorm:"foreignKey:UserId;references:Id"`
-	CreatedPosts           []*ForumPost            `gorm:"foreignKey:UserId;references:Id"`
-	Permissions            []*UserPermission       `gorm:"foreignKey:UserId;references:Id"`
-	RankHistory            []*RankHistory          `gorm:"foreignKey:UserId;references:Id"`
-	PlayHistory            []*PlayHistory          `gorm:"foreignKey:UserId;references:Id"`
-	Achievements           []*Achievement          `gorm:"foreignKey:UserId;references:Id"`
-	Screenshots            []*Screenshot           `gorm:"foreignKey:UserId;references:Id"`
-	Favourites             []*BeatmapFavourite     `gorm:"foreignKey:UserId;references:Id"`
-	Benchmarks             []*Benchmark            `gorm:"foreignKey:UserId;references:Id"`
-	Activities             []*Activity             `gorm:"foreignKey:UserId;references:Id"`
-	Groups                 []*GroupEntry           `gorm:"foreignKey:UserId;references:Id"`
-	Matches                []*Match                `gorm:"foreignKey:CreatorId;references:Id"`
-	Ratings                []*BeatmapRating        `gorm:"foreignKey:UserId;references:Id"`
-	Scores                 []*Score                `gorm:"foreignKey:UserId;references:Id"`
-	Badges                 []*Badge                `gorm:"foreignKey:UserId;references:Id"`
-	Stats                  []*Stats                `gorm:"foreignKey:UserId;references:Id"`
-	Names                  []*Name                 `gorm:"foreignKey:UserId;references:Id"`
-	Plays                  []*BeatmapPlays         `gorm:"foreignKey:UserId;references:Id"`
-	Logins                 []*Login                `gorm:"foreignKey:UserId;references:Id"`
-	HardwareInfos          []*HardwareInfo         `gorm:"foreignKey:UserId;references:Id"`
-	SentDirectMessages     []*DirectMessage        `gorm:"foreignKey:SenderId;references:Id"`
-	ReceivedDirectMessages []*DirectMessage        `gorm:"foreignKey:TargetId;references:Id"`
-	SentReports            []*Report               `gorm:"foreignKey:SenderId;references:Id"`
-	TargetedReports        []*Report               `gorm:"foreignKey:TargetId;references:Id"`
-	Infringements          []*Infringement         `gorm:"foreignKey:UserId;references:Id"`
-	SentMessages           []*Message              `gorm:"foreignKey:Sender;references:Name"`
+	TargetRelationships []*Relationship         `gorm:"foreignKey:TargetId;references:Id"`
+	Relationships       []*Relationship         `gorm:"foreignKey:UserId;references:Id"`
+	Collaborations      []*BeatmapCollaboration `gorm:"foreignKey:UserId;references:Id"`
+	Nominations         []*BeatmapNomination    `gorm:"foreignKey:UserId;references:Id"`
+	BookmarkedTopics    []*ForumBookmark        `gorm:"foreignKey:UserId;references:Id"`
+	SubscribedTopics    []*ForumSubscriber      `gorm:"foreignKey:UserId;references:Id"`
+	Notifications       []*Notification         `gorm:"foreignKey:UserId;references:Id"`
+	Permissions         []*UserPermission       `gorm:"foreignKey:UserId;references:Id"`
+	Achievements        []*Achievement          `gorm:"foreignKey:UserId;references:Id"`
+	Screenshots         []*Screenshot           `gorm:"foreignKey:UserId;references:Id"`
+	Favourites          []*BeatmapFavourite     `gorm:"foreignKey:UserId;references:Id"`
+	Groups              []*GroupEntry           `gorm:"foreignKey:UserId;references:Id"`
+	Badges              []*Badge                `gorm:"foreignKey:UserId;references:Id"`
+	Stats               []*Stats                `gorm:"foreignKey:UserId;references:Id"`
+	Names               []*Name                 `gorm:"foreignKey:UserId;references:Id"`
+	Infringements       []*Infringement         `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (User) TableName() string {
