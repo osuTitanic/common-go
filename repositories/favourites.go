@@ -17,8 +17,9 @@ func (r *BeatmapFavouriteRepository) Create(favourite *schemas.BeatmapFavourite)
 	return r.db.Create(favourite).Error
 }
 
-func (r *BeatmapFavouriteRepository) Update(userId int, setId int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.BeatmapFavourite{}).Where("user_id = ? AND set_id = ?", userId, setId).Updates(updates).Error
+func (r *BeatmapFavouriteRepository) Update(userId int, setId int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.BeatmapFavourite{}).Where("user_id = ? AND set_id = ?", userId, setId).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *BeatmapFavouriteRepository) Delete(favourite *schemas.BeatmapFavourite) error {

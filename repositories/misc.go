@@ -17,8 +17,9 @@ func (r *NotificationRepository) Create(notification *schemas.Notification) erro
 	return r.db.Create(notification).Error
 }
 
-func (r *NotificationRepository) Update(id int64, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.Notification{}).Where("id = ?", id).Updates(updates).Error
+func (r *NotificationRepository) Update(id int64, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.Notification{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *NotificationRepository) Delete(notification *schemas.Notification) error {

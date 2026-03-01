@@ -17,8 +17,9 @@ func (r *StatsRepository) Create(stats *schemas.Stats) error {
 	return r.db.Create(stats).Error
 }
 
-func (r *StatsRepository) Update(userId int, mode int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.Stats{}).Where("id = ? AND mode = ?", userId, mode).Updates(updates).Error
+func (r *StatsRepository) Update(userId int, mode int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.Stats{}).Where("id = ? AND mode = ?", userId, mode).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *StatsRepository) Delete(stats *schemas.Stats) error {

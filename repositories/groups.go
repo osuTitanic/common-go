@@ -17,8 +17,9 @@ func (r *GroupRepository) Create(group *schemas.Group) error {
 	return r.db.Create(group).Error
 }
 
-func (r *GroupRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.Group{}).Where("id = ?", id).Updates(updates).Error
+func (r *GroupRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.Group{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *GroupRepository) Delete(group *schemas.Group) error {
@@ -57,8 +58,9 @@ func (r *GroupEntryRepository) Create(entry *schemas.GroupEntry) error {
 	return r.db.Create(entry).Error
 }
 
-func (r *GroupEntryRepository) Update(userId int, groupId int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.GroupEntry{}).Where("user_id = ? AND group_id = ?", userId, groupId).Updates(updates).Error
+func (r *GroupEntryRepository) Update(userId int, groupId int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.GroupEntry{}).Where("user_id = ? AND group_id = ?", userId, groupId).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *GroupEntryRepository) Delete(entry *schemas.GroupEntry) error {

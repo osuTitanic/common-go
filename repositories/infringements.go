@@ -17,8 +17,9 @@ func (r *InfringementRepository) Create(infringement *schemas.Infringement) erro
 	return r.db.Create(infringement).Error
 }
 
-func (r *InfringementRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.Infringement{}).Where("id = ?", id).Updates(updates).Error
+func (r *InfringementRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.Infringement{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *InfringementRepository) Delete(infringement *schemas.Infringement) error {

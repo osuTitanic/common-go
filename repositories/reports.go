@@ -17,8 +17,9 @@ func (r *ReportRepository) Create(report *schemas.Report) error {
 	return r.db.Create(report).Error
 }
 
-func (r *ReportRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.Report{}).Where("id = ?", id).Updates(updates).Error
+func (r *ReportRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.Report{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *ReportRepository) Delete(report *schemas.Report) error {

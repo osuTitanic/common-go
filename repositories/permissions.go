@@ -17,8 +17,9 @@ func (r *UserPermissionRepository) Create(permission *schemas.UserPermission) er
 	return r.db.Create(permission).Error
 }
 
-func (r *UserPermissionRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.UserPermission{}).Where("id = ?", id).Updates(updates).Error
+func (r *UserPermissionRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.UserPermission{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *UserPermissionRepository) Delete(permission *schemas.UserPermission) error {
@@ -52,8 +53,9 @@ func (r *GroupPermissionRepository) Create(permission *schemas.GroupPermission) 
 	return r.db.Create(permission).Error
 }
 
-func (r *GroupPermissionRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.GroupPermission{}).Where("id = ?", id).Updates(updates).Error
+func (r *GroupPermissionRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.GroupPermission{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *GroupPermissionRepository) Delete(permission *schemas.GroupPermission) error {

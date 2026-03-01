@@ -19,8 +19,9 @@ func (r *UserRepository) Create(user *schemas.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *UserRepository) Update(id int, updates map[string]interface{}) error {
-	return r.db.Model(&schemas.User{}).Where("id = ?", id).Updates(updates).Error
+func (r *UserRepository) Update(id int, updates map[string]interface{}) (int64, error) {
+	result := r.db.Model(&schemas.User{}).Where("id = ?", id).Updates(updates)
+	return result.RowsAffected, result.Error
 }
 
 func (r *UserRepository) Delete(user *schemas.User) error {
