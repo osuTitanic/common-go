@@ -19,3 +19,14 @@ const (
 	BeatmapServerBancho  BeatmapServer = 0
 	BeatmapServerTitanic BeatmapServer = 1
 )
+
+type BeatmapResourceType int
+
+const (
+	BeatmapResourceTypeOsz        BeatmapResourceType = 0
+	BeatmapResourceTypeOszNoVideo BeatmapResourceType = 1
+	BeatmapResourceTypeBeatmap    BeatmapResourceType = 2
+	BeatmapResourceTypeThumbnail  BeatmapResourceType = 3
+	BeatmapResourceTypeBackground BeatmapResourceType = 4
+	BeatmapResourceTypeAudio      BeatmapResourceType = 5
+)

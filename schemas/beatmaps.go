@@ -221,10 +221,10 @@ func (BeatmapComment) TableName() string {
 }
 
 type BeatmapMirror struct {
-	Url      string                  `gorm:"column:url;primaryKey"`
-	Server   constants.BeatmapServer `gorm:"column:server"`
-	Type     int                     `gorm:"column:type"`
-	Priority int                     `gorm:"column:priority;default:0"`
+	Url      string                        `gorm:"column:url;primaryKey"`
+	Server   constants.BeatmapServer       `gorm:"column:server"`
+	Type     constants.BeatmapResourceType `gorm:"column:type"`
+	Priority int                           `gorm:"column:priority;default:0"`
 }
 
 func (BeatmapMirror) TableName() string {
