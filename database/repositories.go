@@ -1,20 +1,22 @@
 package database
 
+import "github.com/osuTitanic/common-go/schemas"
+
 type IUserRepository interface {
-	Create(user *User) error
-	Save(user *User) error
-	Delete(user *User) error
+	Create(user *schemas.User) error
+	Save(user *schemas.User) error
+	Delete(user *schemas.User) error
 
-	ById(id int) (*User, error)
-	ByName(name string) (*User, error)
-	BySafeName(safeName string) (*User, error)
-	ByEmail(email string) (*User, error)
-	ByDiscordId(discordId string) (*User, error)
+	ById(id int) (*schemas.User, error)
+	ByName(name string) (*schemas.User, error)
+	BySafeName(safeName string) (*schemas.User, error)
+	ByEmail(email string) (*schemas.User, error)
+	ByDiscordId(discordId int64) (*schemas.User, error)
 
-	ManyById(userIds []int) ([]*User, error)
-	ManyByName(names []string) ([]*User, error)
-	ManyByRank(limit int, ascending bool) ([]*User, error)
-	ManyByCreationDate(limit int, ascending bool) ([]*User, error)
+	ManyById(userIds []int) ([]*schemas.User, error)
+	ManyByName(names []string) ([]*schemas.User, error)
+	ManyByRank(limit int, ascending bool) ([]*schemas.User, error)
+	ManyByCreationDate(limit int, ascending bool) ([]*schemas.User, error)
 
 	GetUsername(id int) (string, error)
 	GetUserId(name string) (int, error)
