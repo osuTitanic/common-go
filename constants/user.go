@@ -1,5 +1,7 @@
 package constants
 
+import "strings"
+
 type Playstyle uint8
 
 const (
@@ -12,4 +14,30 @@ const (
 
 func (p Playstyle) Has(flag Playstyle) bool {
 	return p&flag != 0
+}
+
+func (p Playstyle) String() string {
+	if p == PlaystyleNotSpecified {
+		return "None"
+	}
+
+	parts := make([]string, 0, 4)
+	if p.Has(PlaystyleMouse) {
+		parts = append(parts, "Mouse")
+	}
+	if p.Has(PlaystyleTablet) {
+		parts = append(parts, "Tablet")
+	}
+	if p.Has(PlaystyleKeyboard) {
+		parts = append(parts, "Keyboard")
+	}
+	if p.Has(PlaystyleTouch) {
+		parts = append(parts, "Touch")
+	}
+
+	if len(parts) == 0 {
+		return "Unknown"
+	}
+
+	return strings.Join(parts, ",")
 }
