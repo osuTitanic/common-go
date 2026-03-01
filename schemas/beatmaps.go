@@ -18,7 +18,7 @@ type Beatmapset struct {
 	DisplayTitle       *string                   `gorm:"column:display_title"`
 	Description        *string                   `gorm:"column:description"`
 	Tags               *string                   `gorm:"column:tags;default:"`
-	Status             int                       `gorm:"column:submission_status;default:3"`
+	Status             constants.BeatmapStatus   `gorm:"column:submission_status;default:3"`
 	HasVideo           bool                      `gorm:"column:has_video;default:false"`
 	HasStoryboard      bool                      `gorm:"column:has_storyboard;default:false"`
 	Server             constants.BeatmapServer   `gorm:"column:server;default:0"`
@@ -65,32 +65,32 @@ func (Beatmapset) TableName() string {
 }
 
 type Beatmap struct {
-	Id               int            `gorm:"column:id;primaryKey;autoIncrement"`
-	SetId            int            `gorm:"column:set_id"`
-	Mode             constants.Mode `gorm:"column:mode;default:0"`
-	Checksum         string         `gorm:"column:md5"`
-	Status           int            `gorm:"column:status;default:2"` // TODO: Use status constant
-	Version          string         `gorm:"column:version"`
-	Filename         string         `gorm:"column:filename"`
-	CreatedAt        time.Time      `gorm:"column:submission_date;autoCreateTime"`
-	LastUpdate       time.Time      `gorm:"column:last_updated;autoCreateTime"`
-	Playcount        int64          `gorm:"column:playcount;default:0"`
-	Passcount        int64          `gorm:"column:passcount;default:0"`
-	TotalLength      int            `gorm:"column:total_length"`
-	DrainLength      int            `gorm:"column:drain_length;default:0"`
-	CountNormal      int            `gorm:"column:count_normal;default:0"`
-	CountSlider      int            `gorm:"column:count_slider;default:0"`
-	CountSpinner     int            `gorm:"column:count_spinner;default:0"`
-	MaxCombo         int            `gorm:"column:max_combo"`
-	BPM              float64        `gorm:"column:bpm;default:0.0"`
-	CS               float64        `gorm:"column:cs;default:0.0"`
-	AR               float64        `gorm:"column:ar;default:0.0"`
-	OD               float64        `gorm:"column:od;default:0.0"`
-	HP               float64        `gorm:"column:hp;default:0.0"`
-	Diff             float64        `gorm:"column:diff;default:0.0"`
-	DiffEyup         float64        `gorm:"column:diff_eyup;default:0.0"`
-	SliderMultiplier float64        `gorm:"column:slider_multiplier;default:0.0"`
-	Search           string         `gorm:"column:search;type:tsvector;->"`
+	Id               int                     `gorm:"column:id;primaryKey;autoIncrement"`
+	SetId            int                     `gorm:"column:set_id"`
+	Mode             constants.Mode          `gorm:"column:mode;default:0"`
+	Status           constants.BeatmapStatus `gorm:"column:status;default:2"`
+	Checksum         string                  `gorm:"column:md5"`
+	Version          string                  `gorm:"column:version"`
+	Filename         string                  `gorm:"column:filename"`
+	CreatedAt        time.Time               `gorm:"column:submission_date;autoCreateTime"`
+	LastUpdate       time.Time               `gorm:"column:last_updated;autoCreateTime"`
+	Playcount        int64                   `gorm:"column:playcount;default:0"`
+	Passcount        int64                   `gorm:"column:passcount;default:0"`
+	TotalLength      int                     `gorm:"column:total_length"`
+	DrainLength      int                     `gorm:"column:drain_length;default:0"`
+	CountNormal      int                     `gorm:"column:count_normal;default:0"`
+	CountSlider      int                     `gorm:"column:count_slider;default:0"`
+	CountSpinner     int                     `gorm:"column:count_spinner;default:0"`
+	MaxCombo         int                     `gorm:"column:max_combo"`
+	BPM              float64                 `gorm:"column:bpm;default:0.0"`
+	CS               float64                 `gorm:"column:cs;default:0.0"`
+	AR               float64                 `gorm:"column:ar;default:0.0"`
+	OD               float64                 `gorm:"column:od;default:0.0"`
+	HP               float64                 `gorm:"column:hp;default:0.0"`
+	Diff             float64                 `gorm:"column:diff;default:0.0"`
+	DiffEyup         float64                 `gorm:"column:diff_eyup;default:0.0"`
+	SliderMultiplier float64                 `gorm:"column:slider_multiplier;default:0.0"`
+	Search           string                  `gorm:"column:search;type:tsvector;->"`
 
 	Beatmapset            *Beatmapset                    `gorm:"foreignKey:SetId;references:Id"`
 	CollaborationRequests []*BeatmapCollaborationRequest `gorm:"foreignKey:BeatmapId;references:Id"`
