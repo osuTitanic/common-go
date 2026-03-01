@@ -12,6 +12,11 @@ type Forum struct {
 	PostCount   int       `gorm:"column:post_count;default:0;->"`
 	AllowIcons  bool      `gorm:"column:allow_icons;default:true"`
 	Hidden      bool      `gorm:"column:hidden;default:false"`
+
+	Parent    *Forum       `gorm:"foreignKey:ParentId;references:Id"`
+	Subforums []Forum      `gorm:"foreignKey:ParentId;references:Id"`
+	Topics    []ForumTopic `gorm:"foreignKey:ForumId;references:Id"`
+	Posts     []ForumPost  `gorm:"foreignKey:ForumId;references:Id"`
 }
 
 func (Forum) TableName() string {
@@ -35,6 +40,14 @@ type ForumTopic struct {
 	Announcement  bool       `gorm:"column:announcement;default:false"`
 	Hidden        bool       `gorm:"column:hidden;default:false"`
 	Pinned        bool       `gorm:"column:pinned;default:false"`
+
+	Forum       *Forum            `gorm:"foreignKey:ForumId;references:Id"`
+	Icon        *ForumIcon        `gorm:"foreignKey:IconId;references:Id"`
+	Posts       []ForumPost       `gorm:"foreignKey:TopicId;references:Id"`
+	Stars       []ForumStar       `gorm:"foreignKey:TopicId;references:Id"`
+	Creator     *User             `gorm:"foreignKey:CreatorId;references:Id"`
+	Bookmarks   []ForumBookmark   `gorm:"foreignKey:TopicId;references:Id"`
+	Subscribers []ForumSubscriber `gorm:"foreignKey:TopicId;references:Id"`
 }
 
 func (ForumTopic) TableName() string {
@@ -55,6 +68,12 @@ type ForumPost struct {
 	Hidden     bool      `gorm:"column:hidden;default:false"`
 	Draft      bool      `gorm:"column:draft;default:false"`
 	Deleted    bool      `gorm:"column:deleted;default:false"`
+
+	Modding []BeatmapModding `gorm:"foreignKey:PostId;references:Id"`
+	User    *User            `gorm:"foreignKey:UserId;references:Id"`
+	Icon    *ForumIcon       `gorm:"foreignKey:IconId;references:Id"`
+	Topic   *ForumTopic      `gorm:"foreignKey:TopicId;references:Id"`
+	Forum   *Forum           `gorm:"foreignKey:ForumId;references:Id"`
 }
 
 func (ForumPost) TableName() string {
@@ -66,6 +85,9 @@ type ForumIcon struct {
 	Name     string `gorm:"column:name"`
 	Location string `gorm:"column:location"`
 	Order    int    `gorm:"column:order;default:0"`
+
+	Topics []ForumTopic `gorm:"foreignKey:IconId;references:Id"`
+	Posts  []ForumPost  `gorm:"foreignKey:IconId;references:Id"`
 }
 
 func (ForumIcon) TableName() string {
@@ -78,6 +100,9 @@ type ForumReport struct {
 	CreatedAt  time.Time  `gorm:"column:created_at;autoCreateTime"`
 	ResolvedAt *time.Time `gorm:"column:resolved_at"`
 	Reason     string     `gorm:"column:reason"`
+
+	Post *ForumPost `gorm:"foreignKey:PostId;references:Id"`
+	User *User      `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (ForumReport) TableName() string {
@@ -88,6 +113,9 @@ type ForumStar struct {
 	TopicId   int       `gorm:"column:topic_id;primaryKey"`
 	UserId    int       `gorm:"column:user_id;primaryKey"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	User  *User       `gorm:"foreignKey:UserId;references:Id"`
+	Topic *ForumTopic `gorm:"foreignKey:TopicId;references:Id"`
 }
 
 func (ForumStar) TableName() string {
@@ -97,6 +125,9 @@ func (ForumStar) TableName() string {
 type ForumBookmark struct {
 	UserId  int `gorm:"column:user_id;primaryKey"`
 	TopicId int `gorm:"column:topic_id;primaryKey"`
+
+	User  *User       `gorm:"foreignKey:UserId;references:Id"`
+	Topic *ForumTopic `gorm:"foreignKey:TopicId;references:Id"`
 }
 
 func (ForumBookmark) TableName() string {
@@ -106,6 +137,9 @@ func (ForumBookmark) TableName() string {
 type ForumSubscriber struct {
 	UserId  int `gorm:"column:user_id;primaryKey"`
 	TopicId int `gorm:"column:topic_id;primaryKey"`
+
+	User  *User       `gorm:"foreignKey:UserId;references:Id"`
+	Topic *ForumTopic `gorm:"foreignKey:TopicId;references:Id"`
 }
 
 func (ForumSubscriber) TableName() string {

@@ -7,9 +7,11 @@ import (
 
 type Screenshot struct {
 	Id        int       `gorm:"column:id;primaryKey;autoIncrement"`
-	UserId    string    `gorm:"column:user_id"`
+	UserId    int       `gorm:"column:user_id"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
 	Hidden    bool      `gorm:"column:hidden;default:false"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Screenshot) TableName() string {
@@ -26,6 +28,8 @@ type Benchmark struct {
 	CreatedAt  time.Time       `gorm:"column:created_at;autoCreateTime"`
 	Client     string          `gorm:"column:client"`
 	Hardware   json.RawMessage `gorm:"column:hardware;type:jsonb"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Benchmark) TableName() string {

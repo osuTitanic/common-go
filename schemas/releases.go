@@ -31,6 +31,9 @@ type ModdedRelease struct {
 	ClientVersion   int       `gorm:"column:client_version"`
 	ClientExtension string    `gorm:"column:client_extension"`
 	CreatedAt       time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Creator *User       `gorm:"foreignKey:CreatorId;references:Id"`
+	Topic   *ForumTopic `gorm:"foreignKey:TopicId;references:Id"`
 }
 
 func (ModdedRelease) TableName() string {
@@ -47,6 +50,9 @@ type ModdedReleaseEntries struct {
 	UpdateUrl   *string   `gorm:"column:update_url"`
 	PostId      *int      `gorm:"column:post_id"`
 	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Mod  *ModdedRelease `gorm:"foreignKey:ModName;references:Name"`
+	Post *ForumPost     `gorm:"foreignKey:PostId;references:Id"`
 }
 
 func (ModdedReleaseEntries) TableName() string {
@@ -63,6 +69,9 @@ type ModdedReleaseChangelog struct {
 	AuthorId  *int      `gorm:"column:author_id"`
 	Area      *string   `gorm:"column:area"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Entry      *ModdedReleaseEntries `gorm:"foreignKey:EntryId;references:Id"`
+	AuthorUser *User                 `gorm:"foreignKey:AuthorId;references:Id"`
 }
 
 func (ModdedReleaseChangelog) TableName() string {
@@ -87,6 +96,8 @@ type ReleasesOfficial struct {
 	Stream     string    `gorm:"column:stream"`
 	Subversion int       `gorm:"column:subversion"`
 	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Files []*ReleaseFiles `gorm:"many2many:releases_official_entries;foreignKey:Id;joinForeignKey:ReleaseId;References:Id;joinReferences:FileId"`
 }
 
 func (ReleasesOfficial) TableName() string {
@@ -96,6 +107,9 @@ func (ReleasesOfficial) TableName() string {
 type ReleasesOfficialEntries struct {
 	ReleaseId int `gorm:"column:release_id;primaryKey"`
 	FileId    int `gorm:"column:file_id;primaryKey"`
+
+	Release *ReleasesOfficial `gorm:"foreignKey:ReleaseId;references:Id"`
+	File    *ReleaseFiles     `gorm:"foreignKey:FileId;references:Id"`
 }
 
 func (ReleasesOfficialEntries) TableName() string {
@@ -112,6 +126,8 @@ type ReleaseFiles struct {
 	UrlFull     string    `gorm:"column:url_full"`
 	UrlPatch    *string   `gorm:"column:url_patch"`
 	Timestamp   time.Time `gorm:"column:timestamp;autoCreateTime"`
+
+	OfficialReleases []*ReleasesOfficial `gorm:"many2many:releases_official_entries;foreignKey:Id;joinForeignKey:FileId;References:Id;joinReferences:ReleaseId"`
 }
 
 func (ReleaseFiles) TableName() string {

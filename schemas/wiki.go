@@ -12,6 +12,10 @@ type WikiPage struct {
 	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
 	LastUpdated time.Time `gorm:"column:last_updated;autoCreateTime"`
 	CategoryId  int       `gorm:"column:category_id"`
+
+	Category *WikiCategory  `gorm:"foreignKey:CategoryId;references:Id"`
+	Content  []*WikiContent `gorm:"foreignKey:PageId;references:Id"`
+	Outlinks []*WikiOutlink `gorm:"foreignKey:PageId;references:Id"`
 }
 
 func (WikiPage) TableName() string {
@@ -24,6 +28,10 @@ type WikiCategory struct {
 	Translations json.RawMessage `gorm:"column:translations;type:jsonb;default:'{}'"`
 	ParentId     *int            `gorm:"column:parent_id"`
 	CreatedAt    time.Time       `gorm:"column:created_at;autoCreateTime"`
+
+	Parent        *WikiCategory   `gorm:"foreignKey:ParentId;references:Id"`
+	Subcategories []*WikiCategory `gorm:"foreignKey:ParentId;references:Id"`
+	Pages         []*WikiPage     `gorm:"foreignKey:CategoryId;references:Id"`
 }
 
 func (WikiCategory) TableName() string {
@@ -38,6 +46,8 @@ type WikiContent struct {
 	Title       string    `gorm:"column:title"`
 	Content     string    `gorm:"column:content"`
 	Search      string    `gorm:"column:search;type:tsvector;->"`
+
+	Page *WikiPage `gorm:"foreignKey:PageId;references:Id"`
 }
 
 func (WikiContent) TableName() string {
@@ -48,6 +58,9 @@ type WikiOutlink struct {
 	PageId    int       `gorm:"column:page_id;primaryKey"`
 	TargetId  int       `gorm:"column:target_id;primaryKey"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Page   *WikiPage `gorm:"foreignKey:PageId;references:Id"`
+	Target *WikiPage `gorm:"foreignKey:TargetId;references:Id"`
 }
 
 func (WikiOutlink) TableName() string {

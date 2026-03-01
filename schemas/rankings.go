@@ -12,6 +12,8 @@ type Achievement struct {
 	Category   string    `gorm:"column:category"` // TODO: Add constant for categories
 	Filename   string    `gorm:"column:filename"`
 	UnlockedAt time.Time `gorm:"column:unlocked_at;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Achievement) TableName() string {
@@ -49,6 +51,9 @@ type Score struct {
 	Failtime      *int                  `gorm:"column:failtime"`
 	ReplayMd5     *string               `gorm:"column:replay_md5"`
 	ReplayViews   int                   `gorm:"column:replay_views;default:0"`
+
+	User    *User    `gorm:"foreignKey:UserId;references:Id"`
+	Beatmap *Beatmap `gorm:"foreignKey:BeatmapId;references:Id"`
 }
 
 func (Score) TableName() string {
@@ -66,6 +71,8 @@ type RankHistory struct {
 	CountryRank int            `gorm:"column:country_rank"`
 	ScoreRank   int            `gorm:"column:score_rank"`
 	PPv1Rank    int            `gorm:"column:ppv1_rank"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (RankHistory) TableName() string {
@@ -79,6 +86,8 @@ type PlayHistory struct {
 	Month     int            `gorm:"column:month;primaryKey"`
 	Plays     int            `gorm:"column:plays;default:0"`
 	CreatedAt time.Time      `gorm:"column:created_at;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (PlayHistory) TableName() string {
@@ -92,6 +101,8 @@ type ReplayHistory struct {
 	Month       int            `gorm:"column:month;primaryKey"`
 	ReplayViews int            `gorm:"column:replay_views;default:0"`
 	CreatedAt   time.Time      `gorm:"column:created_at;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (ReplayHistory) TableName() string {

@@ -48,6 +48,16 @@ type Beatmapset struct {
 	InfoHash           *string                   `gorm:"column:info_hash"`
 	BodyHash           *string                   `gorm:"column:body_hash"`
 	Search             string                    `gorm:"column:search;type:tsvector;->"`
+
+	CreatorUser    *User                `gorm:"foreignKey:CreatorId;references:Id"`
+	ApprovedByUser *User                `gorm:"foreignKey:ApprovedBy;references:Id"`
+	Beatmaps       []*Beatmap           `gorm:"foreignKey:SetId;references:Id"`
+	Nominations    []*BeatmapNomination `gorm:"foreignKey:SetId;references:Id"`
+	Modding        []*BeatmapModding    `gorm:"foreignKey:SetId;references:Id"`
+	Favourites     []*BeatmapFavourite  `gorm:"foreignKey:SetId;references:Id"`
+	Ratings        []*BeatmapRating     `gorm:"foreignKey:SetId;references:Id"`
+	Plays          []*BeatmapPlays      `gorm:"foreignKey:SetId;references:Id"`
+	PackEntries    []*BeatmapPackEntry  `gorm:"foreignKey:BeatmapsetId;references:Id"`
 }
 
 func (Beatmapset) TableName() string {
@@ -81,6 +91,12 @@ type Beatmap struct {
 	DiffEyup         float64        `gorm:"column:diff_eyup;default:0.0"`
 	SliderMultiplier float64        `gorm:"column:slider_multiplier;default:0.0"`
 	Search           string         `gorm:"column:search;type:tsvector;->"`
+
+	Beatmapset            *Beatmapset                    `gorm:"foreignKey:SetId;references:Id"`
+	CollaborationRequests []*BeatmapCollaborationRequest `gorm:"foreignKey:BeatmapId;references:Id"`
+	Collaborations        []*BeatmapCollaboration        `gorm:"foreignKey:BeatmapId;references:Id"`
+	Ratings               []*BeatmapRating               `gorm:"foreignKey:MapChecksum;references:Checksum"`
+	Plays                 []*BeatmapPlays                `gorm:"foreignKey:BeatmapId;references:Id"`
 }
 
 func (Beatmap) TableName() string {
@@ -93,6 +109,9 @@ type BeatmapCollaboration struct {
 	IsBeatmapAuthor      bool      `gorm:"column:is_beatmap_author;default:false"`
 	AllowResourceUpdates bool      `gorm:"column:allow_resource_updates;default:false"`
 	CreatedAt            time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	User    *User    `gorm:"foreignKey:UserId;references:Id"`
+	Beatmap *Beatmap `gorm:"foreignKey:BeatmapId;references:Id"`
 }
 
 func (BeatmapCollaboration) TableName() string {
@@ -106,6 +125,10 @@ type BeatmapCollaborationRequest struct {
 	BeatmapId            int       `gorm:"column:beatmap_id"`
 	AllowResourceUpdates bool      `gorm:"column:allow_resource_updates;default:false"`
 	CreatedAt            time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	User    *User    `gorm:"foreignKey:UserId;references:Id"`
+	Target  *User    `gorm:"foreignKey:TargetId;references:Id"`
+	Beatmap *Beatmap `gorm:"foreignKey:BeatmapId;references:Id"`
 }
 
 func (BeatmapCollaborationRequest) TableName() string {
@@ -116,6 +139,9 @@ type BeatmapCollaborationBlacklist struct {
 	UserId    int       `gorm:"column:user_id;primaryKey"`
 	TargetId  int       `gorm:"column:target_id;primaryKey"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	User   *User `gorm:"foreignKey:UserId;references:Id"`
+	Target *User `gorm:"foreignKey:TargetId;references:Id"`
 }
 
 func (BeatmapCollaborationBlacklist) TableName() string {
@@ -126,6 +152,9 @@ type BeatmapNomination struct {
 	UserId int       `gorm:"column:user_id;primaryKey"`
 	SetId  int       `gorm:"column:set_id;primaryKey"`
 	Time   time.Time `gorm:"column:time;autoCreateTime"`
+
+	User       *User       `gorm:"foreignKey:UserId;references:Id"`
+	Beatmapset *Beatmapset `gorm:"foreignKey:SetId;references:Id"`
 }
 
 func (BeatmapNomination) TableName() string {
@@ -140,6 +169,11 @@ type BeatmapModding struct {
 	PostId   int       `gorm:"column:post_id"`
 	Amount   int       `gorm:"column:amount;default:0"`
 	Time     time.Time `gorm:"column:time;autoCreateTime"`
+
+	Beatmapset *Beatmapset `gorm:"foreignKey:SetId;references:Id"`
+	Post       *ForumPost  `gorm:"foreignKey:PostId;references:Id"`
+	Target     *User       `gorm:"foreignKey:TargetId;references:Id"`
+	Sender     *User       `gorm:"foreignKey:SenderId;references:Id"`
 }
 
 func (BeatmapModding) TableName() string {
@@ -155,6 +189,9 @@ type BeatmapPack struct {
 	CreatorId    int       `gorm:"column:creator_id"`
 	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"column:updated_at;autoCreateTime"`
+
+	Entries []*BeatmapPackEntry `gorm:"foreignKey:PackId;references:Id"`
+	Creator *User               `gorm:"foreignKey:CreatorId;references:Id"`
 }
 
 func (BeatmapPack) TableName() string {
@@ -165,6 +202,9 @@ type BeatmapPackEntry struct {
 	PackId       int       `gorm:"column:pack_id;primaryKey"`
 	BeatmapsetId int       `gorm:"column:beatmapset_id;primaryKey"`
 	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	Pack       *BeatmapPack `gorm:"foreignKey:PackId;references:Id"`
+	Beatmapset *Beatmapset  `gorm:"foreignKey:BeatmapsetId;references:Id"`
 }
 
 func (BeatmapPackEntry) TableName() string {
@@ -177,6 +217,10 @@ type BeatmapPlays struct {
 	SetId       int    `gorm:"column:set_id"`
 	Count       int    `gorm:"column:count"`
 	BeatmapFile string `gorm:"column:beatmap_file"`
+
+	User       *User       `gorm:"foreignKey:UserId;references:Id"`
+	Beatmap    *Beatmap    `gorm:"foreignKey:BeatmapId;references:Id"`
+	Beatmapset *Beatmapset `gorm:"foreignKey:SetId;references:Id"`
 }
 
 func (BeatmapPlays) TableName() string {
@@ -187,6 +231,9 @@ type BeatmapFavourite struct {
 	UserId    int       `gorm:"column:user_id;primaryKey"`
 	SetId     int       `gorm:"column:set_id;primaryKey"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+
+	User       *User       `gorm:"foreignKey:UserId;references:Id"`
+	Beatmapset *Beatmapset `gorm:"foreignKey:SetId;references:Id"`
 }
 
 func (BeatmapFavourite) TableName() string {
@@ -198,6 +245,10 @@ type BeatmapRating struct {
 	SetId       int    `gorm:"column:set_id"`
 	MapChecksum string `gorm:"column:map_checksum;primaryKey"`
 	Rating      int    `gorm:"column:rating"`
+
+	User       *User       `gorm:"foreignKey:UserId;references:Id"`
+	Beatmap    *Beatmap    `gorm:"foreignKey:MapChecksum;references:Checksum"`
+	Beatmapset *Beatmapset `gorm:"foreignKey:SetId;references:Id"`
 }
 
 func (BeatmapRating) TableName() string {
@@ -214,6 +265,8 @@ type BeatmapComment struct {
 	Comment    string         `gorm:"column:comment"`
 	Format     *string        `gorm:"column:format"`
 	Color      *string        `gorm:"column:color"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (BeatmapComment) TableName() string {

@@ -10,6 +10,8 @@ type Login struct {
 	Time    time.Time `gorm:"column:time;primaryKey;autoCreateTime"`
 	Ip      string    `gorm:"column:ip"`
 	Version string    `gorm:"column:osu_version"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Login) TableName() string {
@@ -46,6 +48,9 @@ type DirectMessage struct {
 	Message  string    `gorm:"column:message"`
 	Time     time.Time `gorm:"column:time;autoCreateTime"`
 	Read     bool      `gorm:"column:read;default:false"`
+
+	Sender *User `gorm:"foreignKey:SenderId;references:Id"`
+	Target *User `gorm:"foreignKey:TargetId;references:Id"`
 }
 
 func (DirectMessage) TableName() string {
@@ -73,6 +78,8 @@ type Activity struct {
 	Type   int             `gorm:"column:type;default:0"`
 	Data   json.RawMessage `gorm:"column:data;type:jsonb;default:'{}'"`
 	Hidden bool            `gorm:"column:hidden;default:false"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Activity) TableName() string {
@@ -86,6 +93,8 @@ type HardwareInfo struct {
 	UniqueId      string `gorm:"column:unique_id;primaryKey"`
 	DiskSignature string `gorm:"column:disk_signature;primaryKey"`
 	Banned        bool   `gorm:"column:banned;default:false"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (HardwareInfo) TableName() string {
@@ -108,6 +117,9 @@ type Match struct {
 	CreatorId int        `gorm:"column:creator_id"`
 	CreatedAt time.Time  `gorm:"column:created_at"`
 	EndedAt   *time.Time `gorm:"column:ended_at"`
+
+	Creator *User        `gorm:"foreignKey:CreatorId;references:Id"`
+	Events  []MatchEvent `gorm:"foreignKey:MatchId;references:Id"`
 }
 
 func (Match) TableName() string {
@@ -119,6 +131,8 @@ type MatchEvent struct {
 	Time    time.Time       `gorm:"column:time;primaryKey;autoCreateTime"`
 	Type    int             `gorm:"column:type"`
 	Data    json.RawMessage `gorm:"column:data;type:jsonb"`
+
+	Match *Match `gorm:"foreignKey:MatchId;references:Id"`
 }
 
 func (MatchEvent) TableName() string {

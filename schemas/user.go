@@ -37,6 +37,43 @@ type User struct {
 	Twitter   *string `gorm:"column:userpage_twitter"`
 	Location  *string `gorm:"column:userpage_location"`
 	Interests *string `gorm:"column:userpage_interests"`
+
+	TargetRelationships    []*Relationship         `gorm:"foreignKey:TargetId;references:Id"`
+	Relationships          []*Relationship         `gorm:"foreignKey:UserId;references:Id"`
+	Collaborations         []*BeatmapCollaboration `gorm:"foreignKey:UserId;references:Id"`
+	ReplayHistory          []*ReplayHistory        `gorm:"foreignKey:UserId;references:Id"`
+	Nominations            []*BeatmapNomination    `gorm:"foreignKey:UserId;references:Id"`
+	BookmarkedTopics       []*ForumBookmark        `gorm:"foreignKey:UserId;references:Id"`
+	SubscribedTopics       []*ForumSubscriber      `gorm:"foreignKey:UserId;references:Id"`
+	Verifications          []*Verification         `gorm:"foreignKey:UserId;references:Id"`
+	Notifications          []*Notification         `gorm:"foreignKey:UserId;references:Id"`
+	CreatedTopics          []*ForumTopic           `gorm:"foreignKey:CreatorId;references:Id"`
+	StarredTopics          []*ForumStar            `gorm:"foreignKey:UserId;references:Id"`
+	CreatedPosts           []*ForumPost            `gorm:"foreignKey:UserId;references:Id"`
+	Permissions            []*UserPermission       `gorm:"foreignKey:UserId;references:Id"`
+	RankHistory            []*RankHistory          `gorm:"foreignKey:UserId;references:Id"`
+	PlayHistory            []*PlayHistory          `gorm:"foreignKey:UserId;references:Id"`
+	Achievements           []*Achievement          `gorm:"foreignKey:UserId;references:Id"`
+	Screenshots            []*Screenshot           `gorm:"foreignKey:UserId;references:Id"`
+	Favourites             []*BeatmapFavourite     `gorm:"foreignKey:UserId;references:Id"`
+	Benchmarks             []*Benchmark            `gorm:"foreignKey:UserId;references:Id"`
+	Activities             []*Activity             `gorm:"foreignKey:UserId;references:Id"`
+	Groups                 []*GroupEntry           `gorm:"foreignKey:UserId;references:Id"`
+	Matches                []*Match                `gorm:"foreignKey:CreatorId;references:Id"`
+	Ratings                []*BeatmapRating        `gorm:"foreignKey:UserId;references:Id"`
+	Scores                 []*Score                `gorm:"foreignKey:UserId;references:Id"`
+	Badges                 []*Badge                `gorm:"foreignKey:UserId;references:Id"`
+	Stats                  []*Stats                `gorm:"foreignKey:UserId;references:Id"`
+	Names                  []*Name                 `gorm:"foreignKey:UserId;references:Id"`
+	Plays                  []*BeatmapPlays         `gorm:"foreignKey:UserId;references:Id"`
+	Logins                 []*Login                `gorm:"foreignKey:UserId;references:Id"`
+	HardwareInfos          []*HardwareInfo         `gorm:"foreignKey:UserId;references:Id"`
+	SentDirectMessages     []*DirectMessage        `gorm:"foreignKey:SenderId;references:Id"`
+	ReceivedDirectMessages []*DirectMessage        `gorm:"foreignKey:TargetId;references:Id"`
+	SentReports            []*Report               `gorm:"foreignKey:SenderId;references:Id"`
+	TargetedReports        []*Report               `gorm:"foreignKey:TargetId;references:Id"`
+	Infringements          []*Infringement         `gorm:"foreignKey:UserId;references:Id"`
+	SentMessages           []*Message              `gorm:"foreignKey:Sender;references:Name"`
 }
 
 func (User) TableName() string {
@@ -66,6 +103,8 @@ type Stats struct {
 	CountB      int     `gorm:"column:b_count;default:0"`
 	CountC      int     `gorm:"column:c_count;default:0"`
 	CountD      int     `gorm:"column:d_count;default:0"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Stats) TableName() string {
@@ -76,6 +115,9 @@ type Relationship struct {
 	UserId   int `gorm:"column:user_id;primaryKey"`
 	TargetId int `gorm:"column:target_id;primaryKey"`
 	Status   int `gorm:"column:status"`
+
+	User   *User `gorm:"foreignKey:UserId;references:Id"`
+	Target *User `gorm:"foreignKey:TargetId;references:Id"`
 }
 
 func (Relationship) TableName() string {
@@ -89,6 +131,8 @@ type Badge struct {
 	Url         *string   `gorm:"column:badge_url"`
 	Description *string   `gorm:"column:badge_description"`
 	Created     time.Time `gorm:"column:created;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Badge) TableName() string {
@@ -101,6 +145,8 @@ type Name struct {
 	UserId    int       `gorm:"column:user_id"`
 	Reserved  bool      `gorm:"column:reserved;default:true"`
 	ChangedAt time.Time `gorm:"column:changed_at;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Name) TableName() string {
@@ -115,6 +161,8 @@ type Infringement struct {
 	Length      *time.Time `gorm:"column:length"`
 	IsPermanent bool       `gorm:"column:is_permanent;default:false"`
 	Description *string    `gorm:"column:description"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Infringement) TableName() string {
@@ -128,6 +176,9 @@ type Report struct {
 	Time     time.Time `gorm:"column:time;autoCreateTime"`
 	Reason   *string   `gorm:"column:reason"`
 	Resolved bool      `gorm:"column:resolved;default:false"`
+
+	Target *User `gorm:"foreignKey:TargetId;references:Id"`
+	Sender *User `gorm:"foreignKey:SenderId;references:Id"`
 }
 
 func (Report) TableName() string {
@@ -140,6 +191,8 @@ type Verification struct {
 	UserId int       `gorm:"column:user_id"`
 	SentAt time.Time `gorm:"column:sent_at;autoCreateTime"`
 	Type   int       `gorm:"column:type;default:0"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Verification) TableName() string {
@@ -154,6 +207,9 @@ type Group struct {
 	Color             string  `gorm:"column:color"`
 	BanchoPermissions *int    `gorm:"column:bancho_permissions;default:0"`
 	Hidden            bool    `gorm:"column:hidden;default:false"`
+
+	Permissions []*GroupPermission `gorm:"foreignKey:GroupId;references:Id"`
+	Entries     []*GroupEntry      `gorm:"foreignKey:GroupId;references:Id"`
 }
 
 func (Group) TableName() string {
@@ -163,6 +219,9 @@ func (Group) TableName() string {
 type GroupEntry struct {
 	GroupId int `gorm:"column:group_id;primaryKey"`
 	UserId  int `gorm:"column:user_id;primaryKey"`
+
+	Group *Group `gorm:"foreignKey:GroupId;references:Id"`
+	User  *User  `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (GroupEntry) TableName() string {
@@ -176,6 +235,8 @@ type UserPermission struct {
 	Rejected   bool      `gorm:"column:rejected;default:false"`
 	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt  time.Time `gorm:"column:updated_at;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (UserPermission) TableName() string {
@@ -189,6 +250,8 @@ type GroupPermission struct {
 	Rejected   bool      `gorm:"column:rejected;default:false"`
 	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt  time.Time `gorm:"column:updated_at;autoCreateTime"`
+
+	Group *Group `gorm:"foreignKey:GroupId;references:Id"`
 }
 
 func (GroupPermission) TableName() string {
@@ -204,6 +267,8 @@ type Notification struct {
 	Link    string    `gorm:"column:link"`
 	Read    bool      `gorm:"column:read;default:false"`
 	Time    time.Time `gorm:"column:time;autoCreateTime"`
+
+	User *User `gorm:"foreignKey:UserId;references:Id"`
 }
 
 func (Notification) TableName() string {
