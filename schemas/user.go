@@ -91,6 +91,17 @@ func (Stats) TableName() string {
 	return "stats"
 }
 
+func (stats *Stats) Clears() int {
+	return stats.CountXH +
+		stats.CountX +
+		stats.CountSH +
+		stats.CountS +
+		stats.CountA +
+		stats.CountB +
+		stats.CountC +
+		stats.CountD
+}
+
 type Relationship struct {
 	UserId   int `gorm:"column:user_id;primaryKey"`
 	TargetId int `gorm:"column:target_id;primaryKey"`
