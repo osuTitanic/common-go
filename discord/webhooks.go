@@ -1,6 +1,15 @@
 package discord
 
-import "time"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"mime/multipart"
+	"net/http"
+	"time"
+)
+
+const WebhookUserAgent = "osuTitanic/officer"
 
 type Footer struct {
 	Text         string  `json:"text"`
@@ -93,4 +102,119 @@ func (w *Webhook) SetFile(name string, data []byte) {
 	w.File = &File{Name: name, Data: data}
 }
 
-// TODO: Post logic
+func (w *Webhook) Post() error {
+	p, err := w.buildPayload()
+	if err != nil {
+		return err
+	}
+
+	jsonData, err := json.Marshal(p)
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload: %w", err)
+	}
+
+	if w.File == nil {
+		return w.postJson(jsonData)
+	}
+	return w.postMultipart(jsonData)
+}
+
+type payload struct {
+	Content   *string `json:"content,omitempty"`
+	Username  *string `json:"username,omitempty"`
+	AvatarURL *string `json:"avatar_url,omitempty"`
+	TTS       *bool   `json:"tts,omitempty"`
+	Embeds    []Embed `json:"embeds"`
+}
+
+func (w *Webhook) buildPayload() (*payload, error) {
+	// Ensure we have a valid payload
+	hasContent := w.Content != nil && *w.Content != ""
+	hasFile := w.File != nil
+	hasEmbeds := len(w.Embeds) > 0
+
+	if !hasContent && !hasFile && !hasEmbeds {
+		return nil, fmt.Errorf(
+			"webhook must contain at least content, a file, or an embed",
+		)
+	}
+
+	// TODO: Truncate content to 2k characters
+	return &payload{
+		Content:   w.Content,
+		Username:  w.Username,
+		AvatarURL: w.AvatarURL,
+		TTS:       w.TTS,
+		Embeds:    w.Embeds,
+	}, nil
+}
+
+func (w *Webhook) postJson(jsonData []byte) error {
+	req, err := http.NewRequest("POST", w.URL, bytes.NewReader(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", WebhookUserAgent)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		// TODO: Read response data
+		return fmt.Errorf(
+			"webhook returned status %d",
+			resp.StatusCode,
+		)
+	}
+	return nil
+}
+
+func (w *Webhook) postMultipart(jsonData []byte) error {
+	var buf bytes.Buffer
+	writer := multipart.NewWriter(&buf)
+
+	if err := writer.WriteField("payload_json", string(jsonData)); err != nil {
+		return fmt.Errorf("failed to write payload field: %w", err)
+	}
+
+	part, err := writer.CreateFormFile("file", w.File.Name)
+	if err != nil {
+		return fmt.Errorf("failed to create form file: %w", err)
+	}
+
+	if _, err := part.Write(w.File.Data); err != nil {
+		return fmt.Errorf("failed to write file data: %w", err)
+	}
+
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("failed to close multipart writer: %w", err)
+	}
+
+	req, err := http.NewRequest("POST", w.URL, &buf)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("User-Agent", WebhookUserAgent)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		// TODO: Read response data
+		return fmt.Errorf(
+			"webhook returned status %d",
+			resp.StatusCode,
+		)
+	}
+	return nil
+}
