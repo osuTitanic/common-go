@@ -1,7 +1,6 @@
 package rankings
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
@@ -15,7 +14,7 @@ type PlayerScore struct {
 
 func (service *RankingsService) ScoreByKey(key string, userId int) (float64, error) {
 	if service == nil || service.client == nil {
-		return 0, fmt.Errorf("rankings: redis client is not initialized")
+		return 0, ErrRedisClientNotInitialized
 	}
 
 	value, err := service.client.ZScore(service.ctx, key, strconv.Itoa(userId)).Result()
@@ -94,7 +93,7 @@ func (service *RankingsService) Kudosu(userId int, country *string) (int64, erro
 
 func (service *RankingsService) PlayerCount(mode int, rankType string, country *string) (int64, error) {
 	if service == nil || service.client == nil {
-		return 0, fmt.Errorf("rankings: redis client is not initialized")
+		return 0, ErrRedisClientNotInitialized
 	}
 	key := service.RankingKey(mode, rankType, country)
 	return service.client.ZCount(service.ctx, key, "1", "+inf").Result()
@@ -102,7 +101,7 @@ func (service *RankingsService) PlayerCount(mode int, rankType string, country *
 
 func (service *RankingsService) TopPlayers(mode int, offset int64, count int64, rankType string, country *string) ([]*PlayerScore, error) {
 	if service == nil || service.client == nil {
-		return nil, fmt.Errorf("rankings: redis client is not initialized")
+		return nil, ErrRedisClientNotInitialized
 	}
 
 	query := &redis.ZRangeBy{

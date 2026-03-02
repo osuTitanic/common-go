@@ -11,10 +11,10 @@ import (
 
 func (service *RankingsService) Update(stats *schemas.Stats, country string) error {
 	if service == nil || service.client == nil {
-		return fmt.Errorf("rankings: redis client is not initialized")
+		return ErrRedisClientNotInitialized
 	}
 	if stats == nil {
-		return fmt.Errorf("rankings: stats is nil")
+		return ErrStatsIsNil
 	}
 
 	country = strings.ToLower(country)
@@ -46,7 +46,7 @@ func (service *RankingsService) Update(stats *schemas.Stats, country string) err
 
 func (service *RankingsService) Remove(userId int, country string) error {
 	if service == nil || service.client == nil {
-		return fmt.Errorf("rankings: redis client is not initialized")
+		return ErrRedisClientNotInitialized
 	}
 	country = strings.ToLower(country)
 	pipe := service.client.Pipeline()
@@ -83,7 +83,7 @@ func (service *RankingsService) Remove(userId int, country string) error {
 
 func (service *RankingsService) RemoveFromCountry(userId int, country string) error {
 	if service == nil || service.client == nil {
-		return fmt.Errorf("rankings: redis client is not initialized")
+		return ErrRedisClientNotInitialized
 	}
 	country = strings.ToLower(country)
 	pipe := service.client.Pipeline()

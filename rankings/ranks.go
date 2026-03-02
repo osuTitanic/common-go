@@ -1,7 +1,6 @@
 package rankings
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
@@ -9,7 +8,7 @@ import (
 
 func (service *RankingsService) RankByKey(key string, userId int) (int, error) {
 	if service == nil || service.client == nil {
-		return 0, fmt.Errorf("rankings: redis client is not initialized")
+		return 0, ErrRedisClientNotInitialized
 	}
 
 	rank, err := service.client.ZRevRank(service.ctx, key, strconv.Itoa(userId)).Result()
