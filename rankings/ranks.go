@@ -13,14 +13,13 @@ func (service *RankingsService) RankByKey(key string, userId int) (int, error) {
 	}
 
 	rank, err := service.client.ZRevRank(service.ctx, key, strconv.Itoa(userId)).Result()
-	if err != nil {
-		if err == redis.Nil {
-			return 0, nil
-		}
-		return 0, err
+	if err == nil {
+		return int(rank + 1), nil
 	}
-
-	return int(rank + 1), nil
+	if err == redis.Nil {
+		return 0, nil
+	}
+	return 0, err
 }
 
 func (service *RankingsService) GlobalRank(userId int, mode int) (int, error) {
