@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"time"
@@ -80,8 +81,8 @@ func (e *Embed) AddField(name, value string, inline bool) {
 }
 
 type File struct {
-	Name string
-	Data []byte
+	Name    string
+	Content io.Reader
 }
 
 type Webhook struct {
@@ -99,7 +100,11 @@ func (w *Webhook) AddEmbed(embed Embed) {
 }
 
 func (w *Webhook) SetFile(name string, data []byte) {
-	w.File = &File{Name: name, Data: data}
+	w.File = &File{Name: name, Content: bytes.NewReader(data)}
+}
+
+func (w *Webhook) SetFileReader(name string, content io.Reader) {
+	w.File = &File{Name: name, Content: content}
 }
 
 func (w *Webhook) Post() error {
@@ -130,7 +135,7 @@ type payload struct {
 func (w *Webhook) buildPayload() (*payload, error) {
 	// Ensure we have a valid payload
 	hasContent := w.Content != nil && *w.Content != ""
-	hasFile := w.File != nil
+	hasFile := w.File != nil && w.File.Content != nil
 	hasEmbeds := len(w.Embeds) > 0
 
 	if !hasContent && !hasFile && !hasEmbeds {
@@ -187,7 +192,7 @@ func (w *Webhook) postMultipart(jsonData []byte) error {
 		return fmt.Errorf("failed to create form file: %w", err)
 	}
 
-	if _, err := part.Write(w.File.Data); err != nil {
+	if _, err := io.Copy(part, w.File.Content); err != nil {
 		return fmt.Errorf("failed to write file data: %w", err)
 	}
 

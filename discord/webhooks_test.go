@@ -2,6 +2,7 @@ package discord
 
 import (
 	"flag"
+	"strings"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ func TestWebhookPostMultipart(t *testing.T) {
 		URL:     url,
 		Content: &content,
 	}
-	w.SetFile("test.txt", []byte("webhook multipart test payload"))
+	w.SetFileReader("test.txt", strings.NewReader("webhook multipart test payload"))
 
 	if err := w.Post(); err != nil {
 		t.Fatalf("Post() error = %v", err)
