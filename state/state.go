@@ -1,6 +1,7 @@
 package state
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/osuTitanic/common-go/email"
 	"github.com/osuTitanic/common-go/logging"
 	"github.com/osuTitanic/common-go/storage"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -17,12 +19,13 @@ import (
 type State struct {
 	*Repositories
 
+	// Core components
 	Config   *config.Config
 	Database *gorm.DB
 	Logger   *slog.Logger
 	Storage  storage.Storage
 	Email    email.Email
-	// TODO: Add redis instance
+	Redis    *redis.Client
 }
 
 func NewState(environmentFiles ...string) (*State, error) {
@@ -59,13 +62,27 @@ func NewState(environmentFiles ...string) (*State, error) {
 		return nil, fmt.Errorf("state: failed to setup email service: %w", err)
 	}
 
+	redisPassword := ""
+	if cfg.RedisPass != nil {
+		redisPassword = *cfg.RedisPass
+	}
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", cfg.RedisHost, cfg.RedisPort),
+		Password: redisPassword,
+	})
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		database.CloseSession(db)
+		return nil, fmt.Errorf("state: failed to connect to Redis: %w", err)
+	}
+
 	return &State{
-		Repositories: NewRepositories(db),
 		Config:       cfg,
 		Database:     db,
 		Logger:       logger,
 		Storage:      fs,
 		Email:        mailer,
+		Redis:        redisClient,
+		Repositories: NewRepositories(db),
 	}, nil
 }
 
