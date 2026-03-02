@@ -4,45 +4,6 @@ import (
 	"fmt"
 )
 
-type Mode int8
-
-const (
-	ModeOsu   Mode = 0
-	ModeTaiko Mode = 1
-	ModeCatch Mode = 2
-	ModeMania Mode = 3
-)
-
-func (m Mode) String() string {
-	switch m {
-	case ModeOsu:
-		return "osu!"
-	case ModeTaiko:
-		return "Taiko"
-	case ModeCatch:
-		return "CatchTheBeat"
-	case ModeMania:
-		return "osu!mania"
-	default:
-		return fmt.Sprintf("%d", m)
-	}
-}
-
-func (m Mode) Alias() string {
-	switch m {
-	case ModeOsu:
-		return "osu"
-	case ModeTaiko:
-		return "taiko"
-	case ModeCatch:
-		return "catch"
-	case ModeMania:
-		return "mania"
-	default:
-		return fmt.Sprintf("%d", m)
-	}
-}
-
 type ScoreStatus int
 
 const (
